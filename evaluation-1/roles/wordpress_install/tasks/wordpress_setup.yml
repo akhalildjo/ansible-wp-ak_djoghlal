@@ -1,0 +1,47 @@
+- name: Download and extract WordPress
+  unarchive:
+    src: https://wordpress.org/latest.zip
+    dest: "{{ wordpress_web_dir }}"
+    remote_src: yes
+    creates: "{{ wordpress_web_dir }}/wp-settings.php"
+
+- name: Remove Apache default index.html
+  file:
+    path: "{{ wordpress_web_dir }}/index.html"
+    state: absent
+
+- name: Set correct permissions
+  file:
+    path: "{{ wordpress_web_dir }}"
+    state: directory
+    recurse: yes
+    owner: "{{ apache_user }}"
+    group: "{{ apache_user }}"
+    mode: '0755'
+
+- name: Ensure correct permissions for WordPress files (Rocky)
+  file:
+    path: "{{ wordpress_web_dir }}"
+    state: directory
+    recurse: yes
+    owner: apache
+    group: apache
+    mode: '0755'
+  when: ansible_os_family == "RedHat"
+
+- name: Configure wp-config.php
+  template:
+    src: wp-config.php.j2
+    dest: "{{ wordpress_web_dir }}/wp-config.php"
+    owner: "{{ apache_user }}"
+    group: "{{ apache_user }}"
+    mode: '0640'
+
+- name: Move WordPress files to web root if extracted in subfolder
+  shell: |
+    if [ -d "{{ wordpress_web_dir }}/wordpress" ]; then
+      mv {{ wordpress_web_dir }}/wordpress/* {{ wordpress_web_dir }}/
+      rm -rf {{ wordpress_web_dir }}/wordpress
+    fi
+  args:
+    warn: false

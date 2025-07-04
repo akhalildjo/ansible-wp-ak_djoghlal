@@ -1,0 +1,117 @@
+- name: Wait for MariaDB to be ready
+  wait_for:
+    port: 3306
+    host: 127.0.0.1
+    state: started
+    delay: 3
+    timeout: 30
+
+# Assure que le plugin d’authentification est bien mysql_native_password
+- name: Ensure MySQL root uses mysql_native_password (Debian)
+  mysql_user:
+    name: root
+    host: localhost
+    plugin: mysql_native_password
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+  when: ansible_os_family == "Debian"
+
+- name: Ensure MySQL root uses mysql_native_password (Rocky)
+  mysql_user:
+    name: root
+    host: localhost
+    plugin: mysql_native_password
+    login_unix_socket: /var/lib/mysql/mysql.sock
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+  when: ansible_os_family == "RedHat"
+
+# Définir le mot de passe root MySQL
+- name: Set MySQL root password (Debian)
+  mysql_user:
+    name: root
+    host: localhost
+    password: "{{ mysql_root_password }}"
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+  no_log: true
+  when: ansible_os_family == "Debian"
+
+- name: Set MySQL root password (Rocky)
+  mysql_user:
+    name: root
+    host: localhost
+    password: "{{ mysql_root_password }}"
+    login_unix_socket: /var/lib/mysql/mysql.sock
+  no_log: true
+  when: ansible_os_family == "RedHat"
+
+# Forcer un flush explicite après changement de mot de passe
+- name: Flush privileges manually
+  command: mysql -u root -p'{{ mysql_root_password }}' -e "FLUSH PRIVILEGES;"
+  args:
+    warn: false
+  when: ansible_os_family in ['Debian', 'RedHat']
+
+# Donner tous les privilèges à root
+- name: Ensure root has all privileges (Debian)
+  mysql_user:
+    name: root
+    host: localhost
+    priv: '*.*:ALL,GRANT'
+    state: present
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+  when: ansible_os_family == "Debian"
+
+- name: Ensure root has all privileges (Rocky)
+  mysql_user:
+    name: root
+    host: localhost
+    priv: '*.*:ALL,GRANT'
+    state: present
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+    login_unix_socket: /var/lib/mysql/mysql.sock
+  when: ansible_os_family == "RedHat"
+
+# Supprimer les utilisateurs anonymes
+- name: Remove anonymous MySQL users
+  mysql_user:
+    name: ''
+    host_all: true
+    state: absent
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+    login_unix_socket: "{{ '/var/run/mysqld/mysqld.sock' if ansible_os_family == 'Debian' else '/var/lib/mysql/mysql.sock' }}"
+
+# Supprimer la base test
+- name: Remove test database
+  mysql_db:
+    name: test
+    state: absent
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+    login_unix_socket: "{{ '/var/run/mysqld/mysqld.sock' if ansible_os_family == 'Debian' else '/var/lib/mysql/mysql.sock' }}"
+
+# Créer la base de données WordPress
+- name: Create WordPress database
+  mysql_db:
+    name: "{{ wordpress_db_name }}"
+    state: present
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+    login_unix_socket: "{{ '/var/run/mysqld/mysqld.sock' if ansible_os_family == 'Debian' else '/var/lib/mysql/mysql.sock' }}"
+
+# Créer l'utilisateur WordPress
+- name: Create WordPress user
+  mysql_user:
+    name: "{{ wordpress_db_user }}"
+    password: "{{ wordpress_db_password }}"
+    priv: "{{ wordpress_db_name }}.*:ALL"
+    host: localhost
+    state: present
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+    login_unix_socket: "{{ '/var/run/mysqld/mysqld.sock' if ansible_os_family == 'Debian' else '/var/lib/mysql/mysql.sock' }}"

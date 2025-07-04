@@ -1,0 +1,71 @@
+- name: Install required packages on Debian
+  apt:
+    name:
+      - apache2
+      - php
+      - libapache2-mod-php
+      - php-mysql
+      - mariadb-server
+      - wget
+      - unzip
+      - python3-pymysql
+    state: present
+    update_cache: yes
+  when: ansible_os_family == "Debian"
+
+- name: Install required packages on Rocky
+  dnf:
+    name:
+      - httpd
+      - php
+      - php-mysqlnd
+      - mariadb-server
+      - wget
+      - unzip
+      - python3-PyMySQL
+      - procps-ng
+    state: present
+  when: ansible_os_family == "RedHat"
+
+- name: Ensure /var/lib/mysql ownership (Rocky)
+  file:
+    path: /var/lib/mysql
+    owner: mysql
+    group: mysql
+    state: directory
+  when: ansible_os_family == "RedHat"
+
+- name: Initialize MariaDB data directory (Rocky)
+  shell: mysql_install_db --user=mysql --ldata=/var/lib/mysql
+  args:
+    creates: /var/lib/mysql/mysql
+  when: ansible_os_family == "RedHat"
+
+- name: Start Apache manually (Ubuntu)
+  shell: service apache2 start
+  when: ansible_os_family == "Debian"
+
+- name: Start Apache manually (Rocky)
+  shell: /usr/sbin/httpd -DFOREGROUND &
+  async: 0
+  poll: 0
+  when: ansible_os_family == "RedHat"
+
+- name: Start MariaDB manually (Debian)
+  shell: mysqld_safe --datadir=/var/lib/mysql &
+  async: 0
+  poll: 0
+  when: ansible_os_family == "Debian"
+
+- name: Start MariaDB manually (Rocky)
+  shell: mysqld_safe --datadir=/var/lib/mysql &
+  async: 0
+  poll: 0
+  when: ansible_os_family == "RedHat"
+
+- name: Wait for MariaDB to start
+  wait_for:
+    port: 3306
+    state: started
+    delay: 5
+    timeout: 30

@@ -1,0 +1,5 @@
+- name: Déploiement WordPress conteneurisé
+  hosts: wordpress
+  become: true
+  roles:
+    - wordpress_install

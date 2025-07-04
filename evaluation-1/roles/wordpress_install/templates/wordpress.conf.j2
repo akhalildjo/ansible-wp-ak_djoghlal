@@ -1,0 +1,9 @@
+<VirtualHost *:80>
+    ServerAdmin admin@localhost
+    DocumentRoot /var/www/html
+    <Directory /var/www/html>
+        AllowOverride All
+    </Directory>
+    ErrorLog {{ '/var/log/apache2/error.log' if ansible_os_family == 'Debian' else '/var/log/httpd/error.log' }}
+    CustomLog {{ '/var/log/apache2/access.log' if ansible_os_family == 'Debian' else '/var/log/httpd/access.log' }} combined
+</VirtualHost>

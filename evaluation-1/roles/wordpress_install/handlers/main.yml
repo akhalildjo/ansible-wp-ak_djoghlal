@@ -1,0 +1,10 @@
+- name: Reload Apache
+  service:
+    name: apache2
+    state: reloaded
+  when: ansible_os_family == "Debian"
+
+- name: Reload Apache
+  debug:
+    msg: "Apache lancé en tâche de fond, pas de reload possible dans ce contexte conteneur."
+  when: ansible_os_family == "RedHat"

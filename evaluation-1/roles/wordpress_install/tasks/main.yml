@@ -1,0 +1,18 @@
+- name: Include package installation
+  import_tasks: install_packages.yml
+
+- name: Include MySQL configuration
+  import_tasks: mysql_config.yml
+
+- name: Include WordPress setup
+  import_tasks: wordpress_setup.yml
+
+- name: Include Apache config
+  import_tasks: apache_config.yml
+
+- name: Ensure Apache is running in foreground (Rocky)
+  shell: |
+    pgrep httpd || /usr/sbin/httpd -DFOREGROUND &
+  args:
+    warn: false
+  when: ansible_os_family == "RedHat"
