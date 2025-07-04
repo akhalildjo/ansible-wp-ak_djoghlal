@@ -1,0 +1,25 @@
+galaxy_info:
+  role_name: wordpress_install
+  author: Ahmed-Khalil DJOGHLAL
+  description: Déploiement automatisé de WordPress avec Apache, PHP et MariaDB sur Ubuntu et Rocky Linux via Ansible.
+  license: MIT
+  min_ansible_version: "2.9"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - 22.04
+        - 20.04
+    - name: EL
+      versions:
+        - 9
+  galaxy_tags:
+    - wordpress
+    - apache
+    - mariadb
+    - php
+    - web
+    - docker
+    - ansible
+    - devops
+
+dependencies: []
