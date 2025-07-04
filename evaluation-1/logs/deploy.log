@@ -26,13 +26,13 @@ Skipping callback 'default', as we already have a stdout callback.
 Skipping callback 'minimal', as we already have a stdout callback.
 Skipping callback 'oneline', as we already have a stdout callback.
 
-PLAYBOOK: site.yml *************************************************************
-1 plays in site.yml
+PLAYBOOK: site_local_role.yml **************************************************
+1 plays in site_local_role.yml
 
 PLAY [Déploiement WordPress conteneurisé] **************************************
 
 TASK [Gathering Facts] *********************************************************
-task path: /home/khalil/ansible_exam/evaluation-1/site.yml:1
+task path: /home/khalil/ansible_exam/evaluation-1/site_local_role.yml:1
 ok: [rocky]
 ok: [ubuntu]
 META: ran handlers
@@ -40,81 +40,4 @@ META: ran handlers
 TASK [wordpress_install : Install required packages on Debian] *****************
 task path: /home/khalil/ansible_exam/evaluation-1/roles/wordpress_install/tasks/install_packages.yml:1
 skipping: [rocky] => {"changed": false, "skip_reason": "Conditional result was False"}
-ok: [ubuntu] => {"cache_update_time": 1751640070, "cache_updated": false, "changed": false}
-
-TASK [wordpress_install : Install required packages on Rocky] ******************
-task path: /home/khalil/ansible_exam/evaluation-1/roles/wordpress_install/tasks/install_packages.yml:16
-skipping: [ubuntu] => {"changed": false, "skip_reason": "Conditional result was False"}
-changed: [rocky] => {"changed": true, "msg": "", "rc": 0, "results": ["Installed: procps-ng-3.3.17-14.el9.x86_64"]}
-
-TASK [wordpress_install : Ensure /var/lib/mysql ownership (Rocky)] *************
-task path: /home/khalil/ansible_exam/evaluation-1/roles/wordpress_install/tasks/install_packages.yml:30
-skipping: [ubuntu] => {"changed": false, "skip_reason": "Conditional result was False"}
-ok: [rocky] => {"changed": false, "gid": 27, "group": "mysql", "mode": "0755", "owner": "mysql", "path": "/var/lib/mysql", "size": 4096, "state": "directory", "uid": 27}
-
-TASK [wordpress_install : Initialize MariaDB data directory (Rocky)] ***********
-task path: /home/khalil/ansible_exam/evaluation-1/roles/wordpress_install/tasks/install_packages.yml:38
-skipping: [ubuntu] => {"changed": false, "skip_reason": "Conditional result was False"}
-ok: [rocky] => {"changed": false, "cmd": "mysql_install_db --user=mysql --ldata=/var/lib/mysql", "delta": null, "end": null, "msg": "Did not run command since '/var/lib/mysql/mysql' exists", "rc": 0, "start": null, "stderr": "", "stderr_lines": [], "stdout": "skipped, since /var/lib/mysql/mysql exists", "stdout_lines": ["skipped, since /var/lib/mysql/mysql exists"]}
-
-TASK [wordpress_install : Start Apache manually (Ubuntu)] **********************
-task path: /home/khalil/ansible_exam/evaluation-1/roles/wordpress_install/tasks/install_packages.yml:44
-skipping: [rocky] => {"changed": false, "skip_reason": "Conditional result was False"}
-changed: [ubuntu] => {"changed": true, "cmd": "service apache2 start", "delta": "0:00:00.012102", "end": "2025-07-04 14:52:29.599429", "msg": "", "rc": 0, "start": "2025-07-04 14:52:29.587327", "stderr": "", "stderr_lines": [], "stdout": " * Starting Apache httpd web server apache2\n * ", "stdout_lines": [" * Starting Apache httpd web server apache2", " * "]}
-
-TASK [wordpress_install : Start Apache manually (Rocky)] ***********************
-task path: /home/khalil/ansible_exam/evaluation-1/roles/wordpress_install/tasks/install_packages.yml:48
-skipping: [ubuntu] => {"changed": false, "skip_reason": "Conditional result was False"}
-changed: [rocky] => {"changed": true, "cmd": "/usr/sbin/httpd -DFOREGROUND &", "delta": "0:00:00.040924", "end": "2025-07-04 14:52:30.032123", "msg": "", "rc": 0, "start": "2025-07-04 14:52:29.991199", "stderr": "AH00558: httpd: Could not reliably determine the server's fully qualified domain name, using 192.168.80.3. Set the 'ServerName' directive globally to suppress this message", "stderr_lines": ["AH00558: httpd: Could not reliably determine the server's fully qualified domain name, using 192.168.80.3. Set the 'ServerName' directive globally to suppress this message"], "stdout": "httpd (pid 924) already running", "stdout_lines": ["httpd (pid 924) already running"]}
-
-TASK [wordpress_install : Start MariaDB manually (Debian)] *********************
-task path: /home/khalil/ansible_exam/evaluation-1/roles/wordpress_install/tasks/install_packages.yml:54
-skipping: [rocky] => {"changed": false, "skip_reason": "Conditional result was False"}
-changed: [ubuntu] => {"changed": true, "cmd": "mysqld_safe --datadir=/var/lib/mysql &", "delta": "0:00:00.060752", "end": "2025-07-04 14:52:30.384673", "msg": "", "rc": 0, "start": "2025-07-04 14:52:30.323921", "stderr": "250704 14:52:30 mysqld_safe A mysqld process already exists", "stderr_lines": ["250704 14:52:30 mysqld_safe A mysqld process already exists"], "stdout": "250704 14:52:30 mysqld_safe Logging to syslog.", "stdout_lines": ["250704 14:52:30 mysqld_safe Logging to syslog."]}
-
-TASK [wordpress_install : Start MariaDB manually (Rocky)] **********************
-task path: /home/khalil/ansible_exam/evaluation-1/roles/wordpress_install/tasks/install_packages.yml:60
-skipping: [ubuntu] => {"changed": false, "skip_reason": "Conditional result was False"}
-changed: [rocky] => {"changed": true, "cmd": "mysqld_safe --datadir=/var/lib/mysql &", "delta": "0:00:00.080996", "end": "2025-07-04 14:52:30.878835", "msg": "", "rc": 0, "start": "2025-07-04 14:52:30.797839", "stderr": "250704 14:52:30 mysqld_safe A mysqld process already exists", "stderr_lines": ["250704 14:52:30 mysqld_safe A mysqld process already exists"], "stdout": "250704 14:52:30 mysqld_safe Logging to '/var/log/mariadb/mariadb.log'.", "stdout_lines": ["250704 14:52:30 mysqld_safe Logging to '/var/log/mariadb/mariadb.log'."]}
-
-TASK [wordpress_install : Wait for MariaDB to start] ***************************
-task path: /home/khalil/ansible_exam/evaluation-1/roles/wordpress_install/tasks/install_packages.yml:66
-ok: [ubuntu] => {"changed": false, "elapsed": 5, "match_groupdict": {}, "match_groups": [], "path": null, "port": 3306, "search_regex": null, "state": "started"}
-ok: [rocky] => {"changed": false, "elapsed": 5, "match_groupdict": {}, "match_groups": [], "path": null, "port": 3306, "search_regex": null, "state": "started"}
-
-TASK [wordpress_install : Wait for MariaDB to be ready] ************************
-task path: /home/khalil/ansible_exam/evaluation-1/roles/wordpress_install/tasks/mysql_config.yml:1
-ok: [ubuntu] => {"changed": false, "elapsed": 3, "match_groupdict": {}, "match_groups": [], "path": null, "port": 3306, "search_regex": null, "state": "started"}
-ok: [rocky] => {"changed": false, "elapsed": 3, "match_groupdict": {}, "match_groups": [], "path": null, "port": 3306, "search_regex": null, "state": "started"}
-
-TASK [wordpress_install : Ensure MySQL root uses mysql_native_password (Debian)] ***
-task path: /home/khalil/ansible_exam/evaluation-1/roles/wordpress_install/tasks/mysql_config.yml:10
-redirecting (type: modules) ansible.builtin.mysql_user to community.mysql.mysql_user
-skipping: [rocky] => {"changed": false, "skip_reason": "Conditional result was False"}
-redirecting (type: modules) ansible.builtin.mysql_user to community.mysql.mysql_user
-ok: [ubuntu] => {"changed": false, "msg": "User unchanged", "password_changed": false, "user": "root"}
-
-TASK [wordpress_install : Ensure MySQL root uses mysql_native_password (Rocky)] ***
-task path: /home/khalil/ansible_exam/evaluation-1/roles/wordpress_install/tasks/mysql_config.yml:20
-skipping: [ubuntu] => {"changed": false, "skip_reason": "Conditional result was False"}
-redirecting (type: modules) ansible.builtin.mysql_user to community.mysql.mysql_user
-redirecting (type: modules) ansible.builtin.mysql_user to community.mysql.mysql_user
-ok: [rocky] => {"changed": false, "msg": "User unchanged", "password_changed": false, "user": "root"}
-
-TASK [wordpress_install : Set MySQL root password (Debian)] ********************
-task path: /home/khalil/ansible_exam/evaluation-1/roles/wordpress_install/tasks/mysql_config.yml:31
-redirecting (type: modules) ansible.builtin.mysql_user to community.mysql.mysql_user
-skipping: [rocky] => {"censored": "the output has been hidden due to the fact that 'no_log: true' was specified for this result", "changed": false}
-redirecting (type: modules) ansible.builtin.mysql_user to community.mysql.mysql_user
-fatal: [ubuntu]: FAILED! => {"censored": "the output has been hidden due to the fact that 'no_log: true' was specified for this result", "changed": false}
-
-TASK [wordpress_install : Set MySQL root password (Rocky)] *********************
-task path: /home/khalil/ansible_exam/evaluation-1/roles/wordpress_install/tasks/mysql_config.yml:40
-redirecting (type: modules) ansible.builtin.mysql_user to community.mysql.mysql_user
-redirecting (type: modules) ansible.builtin.mysql_user to community.mysql.mysql_user
-fatal: [rocky]: FAILED! => {"censored": "the output has been hidden due to the fact that 'no_log: true' was specified for this result", "changed": false}
-
-PLAY RECAP *********************************************************************
-rocky                      : ok=9    changed=3    unreachable=0    failed=1    skipped=5    rescued=0    ignored=0   
-ubuntu                     : ok=7    changed=2    unreachable=0    failed=1    skipped=6    rescued=0    ignored=0   
-
+ [ERROR]: User interrupted execution

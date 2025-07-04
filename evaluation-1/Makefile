@@ -39,7 +39,7 @@ ping:
 deploy:
 	@mkdir -p logs
 	@echo "[+] Déploiement WordPress avec Ansible..."
-	@ansible-playbook -i inventory.yml site.yml -vv > logs/deploy.log 2>&1
+	@ansible-playbook -i inventory.yml site_local_role.yml -vv > logs/deploy.log 2>&1
 
 clean:
 	@echo "[🧹] Suppression des conteneurs et nettoyage..."
