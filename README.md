@@ -91,7 +91,7 @@ Vous devriez voir l’assistant de configuration WordPress (choix de langue).
 
 Si la page par défaut d’Apache s’affiche encore, relancez `make deploy` pour appliquer les bonnes permissions et la suppression des fichiers par défaut.
 
-## 🔧 Variables personnalisables
+## 🧩 Variables personnalisables
 
 Définies dans `roles/wordpress_install/vars/main.yml` :
 
@@ -103,36 +103,44 @@ mysql_root_password: examplerootPW
 wordpress_web_dir: /var/www/html
 ```
 
-## 🧩 Explication du rôle `wordpress_install`
+## 🧩 Explication détaillée du rôle `wordpress_install`
 
-Ce rôle Ansible est structuré pour respecter les bonnes pratiques avec une séparation claire des responsabilités :
+Ce rôle est découpé en plusieurs fichiers pour plus de lisibilité et de réutilisabilité :
 
-### 📦 `install_packages.yml`
+### `install_packages.yml`
 
-Installe Apache, PHP, MariaDB, unzip, wget et les modules nécessaires.
+Installe les paquets nécessaires pour chaque distribution. Les modules conditionnels (`apt` ou `dnf`) sont utilisés en fonction de la famille de l’OS.
 
-### 🛡️ `mysql_config.yml`
+### `mysql_config.yml`
 
-* Supprime les utilisateurs anonymes
-* Supprime la base `test`
-* Réinitialise le mot de passe root
-* Crée la base `wordpress` et l’utilisateur `example`
+* Sécurisation de MariaDB (suppression des utilisateurs anonymes et de la base `test`)
+* Définition du mot de passe root
+* Création de la base `wordpress`
+* Création de l’utilisateur `example`
+* Attribution des droits nécessaires
+* Détection automatique du bon socket (`/var/run/mysqld/mysqld.sock` ou `/var/lib/mysql/mysql.sock`)
 
-### 🌐 `apache_config.yml`
+### `wordpress_setup.yml`
 
-* Crée un fichier de virtualhost pour WordPress (`wordpress.conf`)
-* Active `mod_rewrite`
-* Recharge Apache
+* Téléchargement de WordPress depuis `wordpress.org`
+* Décompression dans le répertoire défini (`wordpress_web_dir`)
+* Création du fichier `wp-config.php` depuis un template Jinja2 dynamique
+* Application des bons droits sur les fichiers pour `www-data` (Debian) ou `apache` (RedHat)
+* Nettoyage de la page par défaut Apache
 
-### 📂 `wordpress_setup.yml`
+### `apache_config.yml`
 
-* Télécharge WordPress depuis le site officiel
-* Configure automatiquement `wp-config.php` via un template Jinja2
-* Applique les bonnes permissions sur les fichiers
+* Déploiement du fichier virtualhost depuis un template (`wordpress.conf.j2`)
+* Activation du site et du module `rewrite` sur Debian
+* Configuration manuelle du `ServerName` sur Rocky
+* Gestion conditionnelle du redémarrage Apache :
 
-### 🔁 `handlers/main.yml`
+  * `service apache2 reload` sur Debian
+  * message informatif sur Rocky (Apache tourne en arrière-plan dans le conteneur, pas de reload possible)
 
-Gère le redémarrage/rechargement du service Apache si des fichiers de configuration sont modifiés.
+### `handlers/main.yml`
+
+Déclenche le redémarrage du service Apache si un fichier de configuration est modifié (template ou copy).
 
 ## 🧹 Nettoyage complet
 
@@ -146,13 +154,12 @@ Cela :
 * Efface la paire de clés SSH
 * Supprime les fichiers de log
 
-## 🧪 Tests attendus
+## ✅ Tests attendus après déploiement
 
-Après déploiement :
-
-* Connexion SSH possible sur les ports 2222 et 2223
-* Ping Ansible (`ansible -m ping`) retourne `pong`
-* WordPress accessible sur ports 8080 et 8081 avec assistant d’installation
+* Connexion SSH fonctionnelle avec Ansible
+* `ansible all -m ping` renvoie `pong`
+* Accès à [http://localhost:8080](http://localhost:8080) et [http://localhost:8081](http://localhost:8081)
+* Affichage de l’interface d’installation WordPress (choix de langue)
 
 ## 👨‍🎓 Auteur
 
@@ -160,4 +167,4 @@ Après déploiement :
 
 ---
 
-🧠 *Projet conçu pour démontrer une automatisation fiable, reproductible et portable sur plusieurs distributions Linux.*
+🧠 *Ce projet est un exemple complet d'infrastructure as code (IaC), prêt à être déployé sur tout environnement supportant Docker et Ansible.*
